@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <conio.h>
+#include <unistd.h>
 using namespace std;
 
 #define x_max 30
@@ -19,6 +20,43 @@ void clearPosition(int x, int y) {
     moveTo(x, y);
     cout << " ";
 }
+
+class ball{
+    int vel_x;
+    int vel_y;
+    int pos_x;
+    int pos_y;
+public:
+    ball(){
+        vel_x = 1;
+        vel_y = 1;
+        pos_x = 5;
+        pos_y = 5;
+    }
+    ball(int v_x, int v_y, int p_x, int p_y){
+        vel_x = v_x;
+        vel_y = v_y;
+        pos_x = p_x;
+        pos_y = p_y;
+    }
+    bool collide_ends(){
+        if(pos_y >= y_max || pos_y <= 0){
+            return true;
+        }
+        return false;
+    }
+    
+    void move_ball(){
+        clearPosition(pos_x + 2, pos_y + 2);
+        moveTo(pos_x + 2 + vel_x, pos_y + 2 + vel_y);
+        cout << 'o';
+        pos_x = pos_x + vel_x;
+        pos_y = pos_y + vel_y;
+        cout.flush();
+    }
+    friend class arena;
+};
+
 
 class bar{
 protected:
@@ -71,10 +109,12 @@ class arena{
     char Arena[x_max][y_max];
     bar bar_1;
     bar bar_2;
+    ball ball_1;
 public:
-    arena(bar b1, bar b2){
+    arena(bar b1, bar b2, ball b){
         bar_1 = b1;
         bar_2 = b2;
+        ball_1 = b;
         cout << bar_1.position <<endl;
     }
 
@@ -125,6 +165,8 @@ public:
     void play(){
         show_arena();
         while(1){
+            sleep(1);
+
             if(bar_1.move_bar() == 'u'){
                 clearPosition(3 , bar_1.position + bar_1.length + 1);
                 moveTo(3, bar_1.position + 1);
@@ -153,6 +195,7 @@ public:
                 cout << '[';
                 cout.flush();
             }
+            ball_1.move_ball();
         }
     }
 };
@@ -164,6 +207,7 @@ public:
 int main(){
     bar b1(5, 1, 4, 119, 115);
     bar b2(5, 1, 5, 72, 80);
-    arena A(b1, b2);
+    ball b(1, 1, 5, 5);
+    arena A(b1, b2, b);
     A.play();
 }
